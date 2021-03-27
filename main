@@ -1,0 +1,715 @@
+from tkinter.ttk import Frame, Label, Entry, Style, Button
+from tkinter import *
+from tkinter import filedialog, messagebox 
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.ticker as ticker 
+import tkinter as tk
+import time
+import os
+from tkinter import colorchooser
+import webbrowser
+from tkinter.ttk import Combobox  
+import math
+
+# LabGraf by HBB & Sashok
+#
+# Version 1.3.1
+#
+# For experemental Phisic's
+
+
+
+
+
+class Main(Frame):
+ 
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+    
+    
+ 
+    def initUI(self):
+        self.color = 'r'
+        self.dip = 600
+        
+        self.master.title("LabGraf V.1.3.1")
+        
+        self.pack(fill=BOTH, expand=True)
+ 
+        frame1 = Frame(self)
+        frame1.pack(fill=X)
+        
+        lbl = Label(frame1, text="LabGraf - лёгкое посторение графиков", font=("Arial Bold", 20))
+        lbl.pack(side=LEFT, padx=285, pady=10)
+        
+        self.chk_state = IntVar()
+        self.chk_state.set(1)
+        self.chk = Checkbutton(frame1, text='Ошибки', variable=self.chk_state)
+        self.chk.pack(side=RIGHT, padx=0, pady=10)
+        
+        
+        frame2 = Frame(self)
+        frame2.pack(fill=X)
+        
+        lbl1 = Label(frame2, text="Название графика:", font=("Arial Bold", 15))
+        lbl1.pack(side=LEFT, padx=10, pady=20)
+        
+        self.lbldata = Entry(frame2)
+        self.lbldata.pack(fill=X, padx=200, expand=True)
+        
+        frame3 = Frame(self)
+        frame3.pack(fill=X)
+        
+        lbl2 = Label(frame3, text="Название осей Ox и Oy (через запятую):", font=("Arial Bold", 15))
+        lbl2.pack(side=LEFT, padx=10, pady=20)
+        
+        self.lbldata2 = Entry(frame3)
+        self.lbldata2.pack(fill=X, padx=0, expand=True)
+        self.lbldata2.insert(1 , "X,Y")
+        
+        frame4 = Frame(self)
+        frame4.pack(fill=BOTH)
+        
+        tochkyOx = Label(frame4, text="Точки по OX (Разделить пробелом):      ", font=("Arial Bold", 15))
+        tochkyOx.pack(side=LEFT, padx=10, pady=2)
+        
+        self.tochkyOx1 = Entry(frame4)
+        self.tochkyOx1.pack(fill=X, padx=0, expand=True)
+        
+        frame5 = Frame(self)
+        frame5.pack(fill=BOTH)
+        
+        tochkyOy = Label(frame5, text="Точки по OY (Разделить пробелом):      ", font=("Arial Bold", 15))
+        tochkyOy.pack(side=LEFT, padx=10, pady=2)
+        
+        self.tochkyOy1 = Entry(frame5)
+        self.tochkyOy1.pack(fill=X, padx=0, expand=True)
+        
+        framehelp = Frame(self)
+        framehelp.pack(fill=BOTH)
+        
+        lblbreak = Label(framehelp, text=" ", font=("Arial Bold", 15))
+        lblbreak.pack(side=LEFT, padx=10, pady=10)
+        
+        #Данные для оси Ox# # Значения: lbldata3 , lbldata4 , lbldata5 #
+        
+        frame6 = Frame(self)
+        frame6.pack(fill=X)
+        
+        lbl3 = Label(frame6, text="Шаг главной сетки по оси Оx:", font=("Arial Bold", 11))
+        lbl3.pack(side=LEFT, padx=10, pady=10)
+        
+        self.lbldata3 = Entry(frame6)
+        self.lbldata3.pack(side=LEFT, padx=0, pady=0, expand=False)
+        
+        lbl4 = Label(frame6, text="Шаг вспомогательной сетки по оси Оx:", font=("Arial Bold", 11))
+        lbl4.pack(side=LEFT, padx=10, pady=3)
+        
+        self.lbldata4 = Entry(frame6)
+        self.lbldata4.pack(side=LEFT, padx=0, expand=False)
+        
+        lbl5 = Label(frame6, text="Погрешность Ox:", font=("Arial Bold", 11))
+        lbl5.pack(side=LEFT, padx=10, pady=3)
+        
+        self.lbldata5 = Entry(frame6)
+        self.lbldata5.pack(side=LEFT, padx=0, expand=False)
+        self.lbldata5.insert(1 , "0.3")
+        
+        #Данные для оси Oy# # Значения: lbldata6 , lbldata7 , lbldata8 #
+        
+        frame7 = Frame(self)
+        frame7.pack(fill=X)
+        
+        lbl6 = Label(frame7, text="Шаг главной сетки по оси Оy:", font=("Arial Bold", 11))
+        lbl6.pack(side=LEFT, padx=10, pady=3)
+        
+        self.lbldata6 = Entry(frame7)
+        self.lbldata6.pack(side=LEFT, padx=0, pady=0, expand=False)      
+        
+        lbl7 = Label(frame7, text="Шаг вспомогательной сетки по оси Оy:", font=("Arial Bold", 11))
+        lbl7.pack(side=LEFT, padx=10, pady=3)
+        
+        self.lbldata7 = Entry(frame7)
+        self.lbldata7.pack(side=LEFT, padx=0, expand=False)
+        
+        lbl8 = Label(frame7, text="Погрешность Oy:", font=("Arial Bold", 11))
+        lbl8.pack(side=LEFT, padx=10, pady=3)
+        
+        self.lbldata8 = Entry(frame7)
+        self.lbldata8.pack(side=LEFT, padx=0, expand=False)
+        self.lbldata8.insert(1 , "0.3")
+        
+        # Разное #
+        
+        frame8 = Frame(self)
+        frame8.pack(fill=X)
+        
+        lbl9 = Label(frame8, text="Размер точек на графике:", font=("Arial Bold", 11))
+        lbl9.pack(side=LEFT, padx=10, pady=6)
+        
+        self.lbldata9 = Entry(frame8)
+        self.lbldata9.pack(side=LEFT, padx=25, pady=6, expand=False)
+        self.lbldata9.insert(1 , "3.5")
+        
+
+        
+
+    
+        
+        #Кнопки#
+        
+        framebtm = Frame(self)
+        framebtm.pack(fill=X)
+        
+        btn1 = Button(framebtm, text="Построить график с учётом погрешности", background="#CCCCCC", padx=145, pady=10, command=self.clicked)
+        btn1.pack(side=LEFT, padx=10, pady=6)
+        
+        btn2 = Button(framebtm, text="Построить график МНК", background="#CCCCCC", padx=300, pady=10, command=self.clickedmct)
+        btn2.pack(fill=X, padx=10, pady=6)
+        
+        #Меню#
+        
+        menubar = Menu(self.master)
+        self.master.config(menu=menubar)
+ 
+        fileMenu = Menu(menubar)
+        fileMenu.add_command(label="Загрузить", command=self.load)
+        fileMenu.add_command(label="Сохранить", command=self.save)
+        fileMenu.add_command(label="Сохранить как..", command=self.saveAS)
+        menubar.add_cascade(label="Файл", menu=fileMenu)
+        
+        settings = Menu(menubar)
+        settings.add_command(label="Изменить цвет графика", command=self.colorchoose)
+        submenu = Menu(settings)
+        submenu.add_command(label="300", command=self.setdip300)
+        submenu.add_command(label="600", command=self.setdip600)
+        submenu.add_command(label="1200", command=self.setdip1200)
+        submenu.add_command(label="1800", command=self.setdip1800)
+        settings.add_cascade(label='Настройка качества dip', menu=submenu, underline=0)
+        ## settings.add_command(label="Пользовательские", command=self.openwindowsettings)
+        menubar.add_cascade(label="Настройки", menu=settings)
+        
+        error = Menu(menubar)
+        menubar.add_cascade(label="Связь с нами", menu=error)
+        error.add_command(label="Группа ВК", command=self.vk)
+        error.add_command(label="Авторы", command=self.avtor)
+        
+        calk = Menu(menubar)
+        menubar.add_cascade(label="Другие функции", menu=calk)
+        calk.add_command(label="Калькулятор", command=self.openwindowsettings)
+        
+    
+    
+    
+    def openwindowsettings(self):
+        Window().mainloop()
+        
+    # Группа ВК #
+    
+    def vk(self):
+        webbrowser.open_new("https://vk.com/public203572089")
+
+
+    
+    # Установка dip #
+    
+    
+    def setdip300(self):
+        self.dip = 300
+        
+    def setdip600(self):
+        self.dip = 600
+    
+    def setdip1200(self):
+        self.dip = 1200
+        
+    def setdip1800(self):
+        self.dip = 1800
+    
+    
+    # Выбор цвета#    
+    def colorchoose(self):
+        (rgb, hx) = colorchooser.askcolor()
+        self.color = hx
+        
+    # Работа с файлами #
+        
+    def load(self):
+        self.file = filedialog.askopenfilename(filetype = (("Text files","*.txt"),("all files","*.*")))
+        f = open(self.file, "r")
+        self.lbldata.delete(0, tk.END)
+        self.lbldata.insert(1 , f.readline())
+        self.lbldata2.delete(0, tk.END)
+        self.lbldata2.insert(1 , f.readline())
+        self.tochkyOx1.delete(0, tk.END)
+        self.tochkyOx1.insert(1 , f.readline())
+        self.tochkyOy1.delete(0, tk.END)
+        self.tochkyOy1.insert(1 , f.readline())
+        self.lbldata3.delete(0, tk.END)
+        self.lbldata3.insert(1 , f.readline())
+        self.lbldata6.delete(0, tk.END)
+        self.lbldata6.insert(1 , f.readline())
+        self.lbldata4.delete(0, tk.END)
+        self.lbldata4.insert(1 , f.readline())
+        self.lbldata7.delete(0, tk.END)
+        self.lbldata7.insert(1 , f.readline())
+        self.lbldata5.delete(0, tk.END)
+        self.lbldata5.insert(1 , f.readline())
+        self.lbldata8.delete(0, tk.END)
+        self.lbldata8.insert(1 , f.readline())
+        self.lbldata9.delete(0, tk.END)
+        self.lbldata9.insert(1 , f.readline())
+        f.close()
+        
+        
+    def saveAS(self):
+        self.dir = filedialog.askdirectory()
+        f = open(self.dir+"/"+"GRAF_"+time.strftime("%d.%Y.%M.%S.", time.localtime())+"txt", "w")
+        f.write(self.lbldata.get() + '\n')
+        f.write(self.lbldata2.get() + '\n')
+        f.write(self.tochkyOx1.get() + '\n')
+        f.write(self.tochkyOy1.get() + '\n')
+        f.write(self.lbldata3.get() + '\n')
+        f.write(self.lbldata6.get() + '\n')
+        f.write(self.lbldata4.get() + '\n')
+        f.write(self.lbldata7.get() + '\n')
+        f.write(self.lbldata5.get() + '\n')
+        f.write(self.lbldata8.get() + '\n')
+        f.write(self.lbldata9.get() + '\n')
+        f.close()
+    
+    def save(self):
+        self.file = filedialog.askopenfilename(filetype = (("Text files","*.txt"),("all files","*.*")))
+        f = open(self.file, "w")
+        f.write(self.lbldata.get())
+        f.write(self.lbldata2.get())
+        f.write(self.tochkyOx1.get())
+        f.write(self.tochkyOy1.get())
+        f.write(self.lbldata3.get())
+        f.write(self.lbldata6.get())
+        f.write(self.lbldata4.get())
+        f.write(self.lbldata7.get())
+        f.write(self.lbldata5.get())
+        f.write(self.lbldata8.get())
+        f.write(self.lbldata9.get())
+        f.close()
+        
+    def avtor(self):
+        messagebox.showinfo('Авторы', 'Эта программа создана лицеистами 1511 10 А класса в 2021 году. Надеемся, что наш труд пригодится многим учащимся, и никто не останется равнодушен к экспериментальной физике. \n \n \n \n        (С) Дубравский Александр и Дорошко Максим')
+        
+        
+    def Gr(self, C,I,nazv_OX = 'ox',nazv_OY = 'oy',zv_graf = 'График 1',sh_gls_OX = 1,sh_gls_OY = 1, sh_vsps_OX = 0.1, sh_vsps_OY = 0.1,xerr = 0,yerr = 0, tochka = 3.5):
+        fig, ax = plt.subplots()
+
+           #----------------------------------------------------------НАЗВАНИЕ ГРАФИКА
+        ax.set_title(zv_graf)
+        #----------------------------------------------------------НАЗВАНИЕ ГРАФИКА
+   
+        #----------------------------------------------------------НАЗВАНИЯ ОСЕЙ
+        plt.xlabel(nazv_OX)
+        plt.ylabel(nazv_OY)
+        #----------------------------------------------------------НАЗВАНИЯ ОСЕЙ
+   
+   
+        ax.minorticks_on()
+        ax.minorticks_on()
+
+    
+    #----------------------------------------------------------ВСПОМОГАТЕЛЬНАЯ СЕТКА    
+        ax.grid(which='minor',
+            color = 'gray',
+            linewidth = 0.4)
+   #----------------------------------------------------------ВСПОМОГАТЕЛЬНАЯ СЕТКА
+   
+   
+   
+        ax.xaxis.set_minor_locator(ticker.MultipleLocator(sh_vsps_OX))#Шаг вспомогательной сетки ОХ
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(sh_gls_OX))#Шаг главной сетки по ОХ
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(sh_gls_OY))#Шаг главной сетки по ОУ
+        ax.yaxis.set_minor_locator(ticker.MultipleLocator(sh_vsps_OY))#Шаг вспомогательной сетки ОУ
+
+   
+
+
+
+   #----------------------------------------------------------ГЛАВНАЯ СЕТКА
+        ax.grid(which='major',
+                color = 'gray')
+   #----------------------------------------------------------ГЛАВНАЯ СЕТКА
+        
+        ax.plot(C, I, self.color , ls='-', ms=tochka)
+    
+    #----------------------------------------------------------Погрешность
+        plt.errorbar(C, I, xerr=xerr, yerr=yerr, fmt='o', ecolor='blue',elinewidth=0.7,capsize = 1.5,ms = tochka)
+    #----------------------------------------------------------Погрешность
+    
+    
+        a = 0
+        
+        b = str(a)
+        
+        while os.path.exists('grafic_'+b+'.png') == True:
+            a = a + 1
+            b = str(a)
+            
+        if self.dip == None:
+            dip = 600
+            
+        plt.savefig('grafic_'+b+'.png', dpi=self.dip , format='png', bbox_inches='tight')
+   
+
+        plt.show()
+
+
+    def MNK(self, zv_graf,nazv_OX,nazv_OY,x1,y1,xerr,yerr,sh_gls_OX,sh_gls_OY,sh_vsps_OX,sh_vsps_OY,tochka):
+        x = np.array(x1)
+        y = np.array(y1)
+        A = np.vstack([x, np.ones(len(x))]).T
+    
+        m, c = np.linalg.lstsq(A, y)[0]
+    
+    
+    
+
+    
+    
+        fig, ax = plt.subplots()
+
+   #----------------------------------------------------------НАЗВАНИЕ ГРАФИКА
+        ax.set_title(zv_graf)
+   #----------------------------------------------------------НАЗВАНИЕ ГРАФИКА
+   
+   #----------------------------------------------------------НАЗВАНИЯ ОСЕЙ
+        plt.xlabel(nazv_OX)
+        plt.ylabel(nazv_OY)
+   #----------------------------------------------------------НАЗВАНИЯ ОСЕЙ
+   
+   
+        ax.minorticks_on()
+        ax.minorticks_on()
+
+    
+    #----------------------------------------------------------ВСПОМОГАТЕЛЬНАЯ СЕТКА    
+        ax.grid(which='minor',
+            color = 'gray',
+            linewidth = 0.4)
+   #----------------------------------------------------------ВСПОМОГАТЕЛЬНАЯ СЕТКА
+   
+   
+   
+        ax.xaxis.set_minor_locator(ticker.MultipleLocator(sh_vsps_OX))#Шаг вспомогательной сетки ОХ
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(sh_gls_OX))#Шаг главной сетки по ОХ
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(sh_gls_OY))#Шаг главной сетки по ОУ
+        ax.yaxis.set_minor_locator(ticker.MultipleLocator(sh_vsps_OY))#Шаг вспомогательной сетки ОУ
+
+   
+
+
+
+   #----------------------------------------------------------ГЛАВНАЯ СЕТКА
+        ax.grid(which='major',
+                color = 'gray')
+   #----------------------------------------------------------ГЛАВНАЯ СЕТКА
+   
+   
+       
+        plt.plot(x, y, 'o', label='Original data', markersize=tochka)
+
+        plt.plot(x, m*x + c, self.color , label='Fitted line')
+    #----------------------------------------------------------Погрешность
+        plt.errorbar(x, y, xerr=xerr, yerr=yerr, fmt='o', ecolor='blue',elinewidth=1.5,capsize = 3,alpha = 0.4,ms = tochka)
+    #----------------------------------------------------------Погрешность
+        
+        a = 0
+        
+        b = str(a)
+        
+        while os.path.exists('grafic_'+b+'_МНК.png') == True:
+            a = a + 1
+            b = str(a)
+        
+        if self.dip == None:
+            dip = 600
+            
+        plt.savefig('grafic_'+b+'_МНК.png', dpi=self.dip , format='png', bbox_inches='tight')
+   
+        plt.show()
+        
+    
+    
+    def clicked(self):
+        
+        # Ошибки #
+        if self.chk_state.get() == 1:
+            if (len(self.tochkyOx1.get().split()))<=1:
+                messagebox.showinfo('Ошибка', 'Не хватает значений Ox')
+            if (len(self.tochkyOy1.get().split()))<=1:
+                messagebox.showinfo('Ошибка', 'Не хватает значений Oy')
+            if (self.lbldata3.get())=="":
+                messagebox.showinfo('Ошибка', 'Не задан шаг главной оси по Ox')
+            if (self.lbldata6.get())=="":
+                messagebox.showinfo('Ошибка', 'Не задан шаг главной оси по Oy')
+            if len(self.tochkyOx1.get().split())!=len(self.tochkyOy1.get().split()):
+                messagebox.showinfo('Ошибка', 'Колличество введённых точек не совпадает!')
+            if (self.lbldata4.get())=="":
+                messagebox.showinfo('Исправление', 'Значение сетки по Ox, задано автоматически')
+            if (self.lbldata7.get())=="":
+                messagebox.showinfo('Исправление', 'Значение сетки по Oy, задано автоматически')
+            lbl , lbl1 = self.lbldata2.get().split(",")
+            OX_label = lbl
+            OY_label = lbl1
+            if (self.lbldata.get())=="":
+                messagebox.showinfo('Исправление', 'Название графика задано автоматически')
+                Graph_label = "Грфик функции " + lbl + " от " + lbl1
+            else:
+                Graph_label = self.lbldata.get()
+        elif self.chk_state.get() == 0:
+            lbl , lbl1 = self.lbldata2.get().split(",")
+            OX_label = lbl
+            OY_label = lbl1
+            if (self.lbldata.get())=="":
+                Graph_label = "Грфик функции " + lbl + " от " + lbl1
+            else:
+                Graph_label = self.lbldata.get()
+            
+        
+        
+        
+        # Функция расчёта #
+        if self.color == None:
+            self.color = 'r'
+        X = self.tochkyOx1.get().split()#Первый набор точек
+        Y = self.tochkyOy1.get().split()#Второй набор точек
+        Xkol = len(X)
+        Ykol = len(Y)
+        for i in range(Xkol):
+            X[i] = float(X[i])
+        for i in range(Ykol):
+            Y[i] = float(Y[i])
+        shag_glavnoi_osi_OX = float(self.lbldata3.get())
+        shag_glavnoi_osi_OY = float(self.lbldata6.get())
+        if (self.lbldata4.get() == ""):
+            shag_Vspomogatelnoi_osi_OX = shag_glavnoi_osi_OX/10
+            self.lbldata4.delete(0, tk.END)
+            self.lbldata4.insert(1 , shag_Vspomogatelnoi_osi_OX)
+        else:
+            shag_Vspomogatelnoi_osi_OX = float(self.lbldata4.get())
+        if (self.lbldata7.get() == ""):
+            shag_Vspomogatelnoi_osi_OY = shag_glavnoi_osi_OY/10
+            self.lbldata7.delete(0, tk.END)
+            self.lbldata7.insert(1 , shag_Vspomogatelnoi_osi_OY)
+        else:
+            shag_Vspomogatelnoi_osi_OY = float(self.lbldata7.get())
+        pogreshnost_OX = float(self.lbldata5.get())
+        pogreshnost_OY = float(self.lbldata8.get())
+        Razmer_tochek = float(self.lbldata9.get())
+        
+        self.Gr(X,Y,OX_label,OY_label,Graph_label,shag_glavnoi_osi_OX,shag_glavnoi_osi_OY,shag_Vspomogatelnoi_osi_OX,shag_Vspomogatelnoi_osi_OY,pogreshnost_OX,pogreshnost_OY,Razmer_tochek)
+        
+        a = 0
+        
+        b = str(a)
+        
+        while os.path.exists('grafic_'+b+'.png') == True:
+            a = a + 1
+            b = str(a)
+            
+        a = a - 1
+        b = str(a)
+        
+        os.system("grafic_"+b+".png")
+        
+    def clickedmct(self):
+        
+        # Ошибки #
+        if self.chk_state.get() == 1:
+            if (len(self.tochkyOx1.get().split()))<=1:
+                messagebox.showinfo('Ошибка', 'Не хватает значений Ox')
+            if (len(self.tochkyOy1.get().split()))<=1:
+                messagebox.showinfo('Ошибка', 'Не хватает значений Oy')
+            if (self.lbldata3.get())=="":
+                messagebox.showinfo('Ошибка', 'Не задан шаг главной оси по Ox')
+            if (self.lbldata6.get())=="":
+                messagebox.showinfo('Ошибка', 'Не задан шаг главной оси по Oy')
+            if len(self.tochkyOx1.get().split())!=len(self.tochkyOy1.get().split()):
+                messagebox.showinfo('Ошибка', 'Колличество введённых точек не совпадает!')
+            if (self.lbldata4.get())=="":
+                messagebox.showinfo('Исправление', 'Значение сетки по Ox, задано автоматически')
+            if (self.lbldata7.get())=="":
+                messagebox.showinfo('Исправление', 'Значение сетки по Oy, задано автоматически')
+            lbl , lbl1 = self.lbldata2.get().split(",")
+            OX_label = lbl
+            OY_label = lbl1
+            if (self.lbldata.get())=="":
+                messagebox.showinfo('Исправление', 'Название графика задано автоматически')
+                Graph_label = "Грфик функции " + lbl + " от " + lbl1
+            else:
+                Graph_label = self.lbldata.get()
+        elif self.chk_state.get() == 0:
+            lbl , lbl1 = self.lbldata2.get().split(",")
+            OX_label = lbl
+            OY_label = lbl1
+            if (self.lbldata.get())=="":
+                Graph_label = "Грфик функции " + lbl + " от " + lbl1
+            else:
+                Graph_label = self.lbldata.get()
+        
+        
+        
+        # Функция расчёта #
+        if self.color == None:
+            self.color = 'r'
+        X = self.tochkyOx1.get().split()#Первый набор точек
+        Y = self.tochkyOy1.get().split()#Второй набор точек
+        Xkol = len(X)
+        Ykol = len(Y)
+        for i in range(Xkol):
+            X[i] = float(X[i])
+        for i in range(Ykol):
+            Y[i] = float(Y[i])
+        Graph_label = self.lbldata.get()
+        lbl , lbl1 = self.lbldata2.get().split(",")
+        OX_label = lbl
+        OY_label = lbl1
+        shag_glavnoi_osi_OX = float(self.lbldata3.get())
+        shag_glavnoi_osi_OY = float(self.lbldata6.get())
+        if (self.lbldata4.get() == ""):
+            shag_Vspomogatelnoi_osi_OX = shag_glavnoi_osi_OX/10
+            self.lbldata4.delete(0, tk.END)
+            self.lbldata4.insert(1 , shag_Vspomogatelnoi_osi_OX)
+        else:
+            shag_Vspomogatelnoi_osi_OX = float(self.lbldata4.get())
+        if (self.lbldata7.get() == ""):
+            shag_Vspomogatelnoi_osi_OY = shag_glavnoi_osi_OY/10
+            self.lbldata7.delete(0, tk.END)
+            self.lbldata7.insert(1 , shag_Vspomogatelnoi_osi_OY)
+        else:
+            shag_Vspomogatelnoi_osi_OY = float(self.lbldata7.get())
+        pogreshnost_OX = float(self.lbldata5.get())
+        pogreshnost_OY = float(self.lbldata8.get())
+        Razmer_tochek = float(self.lbldata9.get())
+        
+        self.MNK(Graph_label,OX_label,OY_label,X,Y,pogreshnost_OX,pogreshnost_OY,shag_glavnoi_osi_OX,shag_glavnoi_osi_OY,shag_Vspomogatelnoi_osi_OX,shag_Vspomogatelnoi_osi_OY,Razmer_tochek)
+        
+        a = 0
+        
+        b = str(a)
+        
+        while os.path.exists('grafic_'+b+'_МНК.png') == True:
+            a = a + 1
+            b = str(a)
+            
+        a = a - 1
+        b = str(a)
+        
+        os.system("grafic_"+b+"_МНК.png")
+        
+class Window(tk.Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.geometry('300x245')
+        self.resizable(False, False)
+        
+        frame1 = Frame(self)
+        frame1.pack(fill=X)
+        
+        lbl1 = Label(frame1, text="Калькулятор погрешностей", font=("Arial Bold", 15))
+        lbl1.pack(side=TOP, padx=10, pady=20)
+        
+        frame2 = Frame(self)
+        frame2.pack(fill=X)
+        
+        self.lbldata = Entry(frame2)
+        self.lbldata.pack(side=LEFT, padx=4, expand=False, ipady=10)
+        
+        self.combo = Combobox(frame2, values=['+','-','/','*'], state="readonly", width=1)
+        self.combo.pack(side=LEFT, padx=0)
+        
+        self.lbldata1 = Entry(frame2)
+        self.lbldata1.pack(side=RIGHT, padx=4, expand=False, ipady=10)
+        
+        frame4 = Frame(self)
+        frame4.pack(fill=X)
+        
+        lbl1 = Label(frame4, text="ПОГРЕШНОСТИ:", font=("Arial Bold", 11))
+        lbl1.pack(side=TOP, padx=0, pady=5)
+        
+        frame3 = Frame(self)
+        frame3.pack(fill=X)
+        
+        self.lbldata2 = Entry(frame3)
+        self.lbldata2.pack(side=LEFT, padx=4, pady=5, expand=False, ipady=10)
+        
+        self.lbldata3 = Entry(frame3)
+        self.lbldata3.pack(side=RIGHT, padx=4, pady=5, expand=False, ipady=10)
+        
+        framebtm = Frame(self)
+        framebtm.pack(fill=X)
+        
+        btn = Button(framebtm, text="Подсчитать", background="#CCCCCC", padx=300, pady=10, command=self.clickedmct)
+        btn.pack(fill=X, padx=10, pady=2)
+    
+    def clickedmct(self):
+        znach = self.combo.get()
+        if znach == '+':
+            self.otnospogSUM()
+        
+        if znach == '-':
+            self.otnospogRAZ()
+
+    def otnospogSUM(self):
+        E1 = float(self.lbldata2.get())/float(self.lbldata.get())
+        E2 = float(self.lbldata3.get())/float(self.lbldata1.get())
+        c = float(self.lbldata.get())+float(self.lbldata1.get())
+        e = E1+E2
+        Ec = e/c
+        EcA = Ec+float(self.lbldata2.get())+float(self.lbldata3.get())
+        Ec = round(Ec, 5)
+        EcA = round(EcA, 5)
+        c = round(c, 2)
+        messagebox.showinfo('Результат', 'Сумма погрешностей\n'+self.lbldata.get()+'-'+self.lbldata1.get()+'='+str(c)+'\n'+'Остносительная: '+str(Ec)+'\nАбсолютная: '+str(EcA))
+        
+        
+    def otnospogRAZ(self):
+        E1 = float(self.lbldata2.get())/float(self.lbldata.get())
+        E2 = float(self.lbldata3.get())/float(self.lbldata1.get())
+        c = float(self.lbldata.get())-float(self.lbldata1.get())
+        e = E1+E2
+        Ec = e/c
+        EcA = Ec+float(self.lbldata2.get())+float(self.lbldata3.get())
+        Ec = round(Ec, 5)
+        EcA = round(EcA, 5)
+        c = round(c, 2)
+        messagebox.showinfo('Результат', 'Разность погрешностей\n'+self.lbldata.get()+'-'+self.lbldata1.get()+'='+str(c)+'\n'+'Остносительная: '+str(Ec)+'\nАбсолютная: '+str(EcA))
+        
+        
+def main():
+    
+    root = tk.Tk()
+    w = ((root.winfo_screenwidth() // 2) - 550)
+    h = ((root.winfo_screenheight() // 2) - 255)
+    root.geometry('1139x495+{}+{}'.format(w, h))
+    root.resizable(False, False)
+    # root.iconbitmap('1.ico')
+    
+    
+    # Создание конфига #
+    
+    if os.path.exists('Gconfig.txt') == False:
+      f = open('Gconfig.txt', "w")
+      f.write('r' + '\n') # Цвет графика #
+      f.write('600' + '\n') # Dip #
+      f.write('r' + '\n')
+      f.close()
+    
+    #                  #
+    
+    app = Main()
+    root.mainloop()
+    
+    
+
+if __name__ == '__main__':
+    main()
